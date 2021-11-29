@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\Moji podaci\\FAX podaci\\IV godina\\VII semestar\\Zastita informacija\\LAB-Zadatak1\\ZAD1\\ZAD1\\ZAD1.csproj": {}
+    "E:\\Moji podaci\\FAX podaci\\IV godina\\VII semestar\\Zastita informacija\\Lab. vezbe\\LAB-Zadatak1\\ZAD1\\ZAD1\\ZAD1.csproj": {}
   },
   "projects": {
-    "E:\\Moji podaci\\FAX podaci\\IV godina\\VII semestar\\Zastita informacija\\LAB-Zadatak1\\ZAD1\\ZAD1\\ZAD1.csproj": {
+    "E:\\Moji podaci\\FAX podaci\\IV godina\\VII semestar\\Zastita informacija\\Lab. vezbe\\LAB-Zadatak1\\ZAD1\\ZAD1\\ZAD1.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\Moji podaci\\FAX podaci\\IV godina\\VII semestar\\Zastita informacija\\LAB-Zadatak1\\ZAD1\\ZAD1\\ZAD1.csproj",
+        "projectUniqueName": "E:\\Moji podaci\\FAX podaci\\IV godina\\VII semestar\\Zastita informacija\\Lab. vezbe\\LAB-Zadatak1\\ZAD1\\ZAD1\\ZAD1.csproj",
         "projectName": "ZAD1",
-        "projectPath": "E:\\Moji podaci\\FAX podaci\\IV godina\\VII semestar\\Zastita informacija\\LAB-Zadatak1\\ZAD1\\ZAD1\\ZAD1.csproj",
+        "projectPath": "E:\\Moji podaci\\FAX podaci\\IV godina\\VII semestar\\Zastita informacija\\Lab. vezbe\\LAB-Zadatak1\\ZAD1\\ZAD1\\ZAD1.csproj",
         "packagesPath": "C:\\Users\\Infinity\\.nuget\\packages\\",
-        "outputPath": "E:\\Moji podaci\\FAX podaci\\IV godina\\VII semestar\\Zastita informacija\\LAB-Zadatak1\\ZAD1\\ZAD1\\obj\\",
+        "outputPath": "E:\\Moji podaci\\FAX podaci\\IV godina\\VII semestar\\Zastita informacija\\Lab. vezbe\\LAB-Zadatak1\\ZAD1\\ZAD1\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Infinity\\AppData\\Roaming\\NuGet\\NuGet.Config",
