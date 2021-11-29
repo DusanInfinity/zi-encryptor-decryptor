@@ -1,14 +1,17 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using ZAD2.App;
 
 namespace ZAD1
 {
     class FileLogic
     {
-        private readonly RC4 rc4 = new RC4();
+        private ICipherAlgorithm Algorithm;
         private string KeysPath;
 
-        public FileLogic(string keysPath)
+        public FileLogic(ICipherAlgorithm algorithm, string keysPath)
         {
+            Algorithm = algorithm;
             KeysPath = keysPath;
         }
 
@@ -21,16 +24,16 @@ namespace ZAD1
         {
             string plainText = LoadTextFromFile(fileName);
 
-            rc4.PlainText = plainText;
-            string generatedKey = rc4.GenerateNewKey();
-            if (rc4.Encrypt())
+            Algorithm.PlainText = plainText;
+            string generatedKey = Algorithm.GenerateAndSetNewKey();
+            if (Algorithm.Encrypt())
             {
-                string encryptedText = rc4.CryptedText;
+                string encryptedText = Algorithm.CryptedText;
 
                 string fileNameForDest = Path.GetFileName(fileName);
                 SaveTextToFile(encryptedText, Path.Combine(destDirectory, fileNameForDest));
 
-                string keyFileName = $"{Path.GetFileNameWithoutExtension(fileName)}.key";
+                string keyFileName = $"{Path.GetFileNameWithoutExtension(fileName)}.{GetKeyExtension()}";
                 SaveTextToFile(generatedKey, Path.Combine(destDirectory, keyFileName));
             }
         }
@@ -39,20 +42,43 @@ namespace ZAD1
         {
             string encryptedText = LoadTextFromFile(fileName);
 
-            string key = LoadKeyForFile(fileName);
-            rc4.SetEncriptionKey(key);
-            rc4.CryptedText = encryptedText;
-            if (rc4.Decrypt())
-                return rc4.PlainText;
+            string key;
+            try
+            {
+                key = LoadKeyForFile(fileName);
+            }
+            catch
+            {
+                throw new Exception("Nije pronadjen fajl sa kljucem!");
+            }
+
+            Algorithm.SetEncriptionKey(key);
+            Algorithm.CryptedText = encryptedText;
+            if (Algorithm.Decrypt())
+                return Algorithm.PlainText;
 
             return "ERROR";
+        }
+
+        public void SetAlgorithm(ICipherAlgorithm algorithm)
+        {
+            if (algorithm.GetType() == Algorithm.GetType()) return;
+
+            Algorithm = algorithm;
         }
 
         public string LoadKeyForFile(string filePath)
         {
             string name = Path.GetFileNameWithoutExtension(filePath);
-            string keyPath = Path.Combine(KeysPath, $"{name}.key");
+            string keyPath = Path.Combine(KeysPath, $"{name}.{GetKeyExtension()}");
             return LoadTextFromFile(keyPath);
+        }
+
+        // Dodajemo prefix radi lakseg prepoznavanja koji algoritam je enkriptovao fajl, sve moze da radi i  sa zajednickom(.key) ekstenzijom.
+        private string GetKeyExtension()
+        {
+            //return "key";
+            return $"{Algorithm.GetType().Name.ToLower()}key";
         }
 
 

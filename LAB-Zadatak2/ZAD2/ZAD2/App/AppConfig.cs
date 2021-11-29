@@ -8,6 +8,7 @@ namespace ZAD1.App
     {
         public string Izvor { get; set; } = "";
         public string Odrediste { get; set; } = "";
+        public int Algoritam { get; set; } = 0;
 
         private static readonly string ConfFile = "config.json";
 

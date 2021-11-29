@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Text;
+using ZAD2.App;
 
 namespace ZAD1
 {
-    class RC4
+    class RC4 : ICipherAlgorithm
     {
         private string EncryptionKey = "";
         private const int KeyLen = 128; // ASCII tabela - 7bit
@@ -74,7 +75,7 @@ namespace ZAD1
             }
         }
 
-        public string GenerateNewKey()
+        public string GenerateAndSetNewKey()
         {
             string key = Guid.NewGuid().ToString();
             SetEncriptionKey(key);

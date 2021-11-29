@@ -243,11 +243,13 @@ namespace ZAD1
             // 
             this.cBoxIzborAlgoritma.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.cBoxIzborAlgoritma.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cBoxIzborAlgoritma.FormattingEnabled = true;
             this.cBoxIzborAlgoritma.Location = new System.Drawing.Point(181, 37);
             this.cBoxIzborAlgoritma.Name = "cBoxIzborAlgoritma";
             this.cBoxIzborAlgoritma.Size = new System.Drawing.Size(121, 23);
             this.cBoxIzborAlgoritma.TabIndex = 3;
+            this.cBoxIzborAlgoritma.SelectionChangeCommitted += new System.EventHandler(this.cBoxIzborAlgoritma_SelectionChangeCommitted);
             // 
             // MainWin
             // 
@@ -260,7 +262,7 @@ namespace ZAD1
             this.Controls.Add(this.gbKodiranje);
             this.MinimumSize = new System.Drawing.Size(436, 430);
             this.Name = "MainWin";
-            this.Text = "RC4 Encryptor/Decryptor";
+            this.Text = "ZI Encryptor/Decryptor";
             this.gbKodiranje.ResumeLayout(false);
             this.gbKodiranje.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.fsWatcher)).EndInit();

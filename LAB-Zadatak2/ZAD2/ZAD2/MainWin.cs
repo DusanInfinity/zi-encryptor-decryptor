@@ -3,6 +3,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using ZAD1.App;
+using ZAD2.App;
 
 namespace ZAD1
 {
@@ -10,18 +11,22 @@ namespace ZAD1
     {
         private readonly FileLogic fLogic;
         private readonly AppConfig config;
+        private int currentAlgorithmIndex = 0;
 
         public MainWin()
         {
             InitializeComponent();
 
-            fLogic = new FileLogic(tbOdrediste.Text);
+            fLogic = new FileLogic(new RC4(), tbOdrediste.Text);
+            cBoxIzborAlgoritma.Items.AddRange(new[] { "RC4", "XTEA" });
+            cBoxIzborAlgoritma.SelectedIndex = 0;
 
             rbFSWNeaktivan.Checked = true;
 
             config = AppConfig.UcitajKonfiguraciju();
             SetIzvor(config.Izvor);
             SetOdrediste(config.Odrediste);
+            SetAlgorithm(config.Algoritam);
         }
 
         private void SetIzvor(string path)
@@ -38,6 +43,47 @@ namespace ZAD1
 
             tbOdrediste.Text = path;
             fLogic.SetKeysPath(path);
+        }
+
+        private static ICipherAlgorithm GetAlgoritmInstanceByIndex(int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    {
+                        return new RC4();
+                    }
+                case 1:
+                    {
+                        return new XTEA();
+                    }
+                default:
+                    return null;
+            }
+        }
+
+        private void SetAlgorithm(int algorithmIndex)
+        {
+            if (currentAlgorithmIndex == algorithmIndex) return;
+
+
+            ICipherAlgorithm algorithm = GetAlgoritmInstanceByIndex(algorithmIndex);
+            if (algorithm == null) return;
+
+            fLogic.SetAlgorithm(algorithm);
+            currentAlgorithmIndex = algorithmIndex;
+
+            if (config.Algoritam != algorithmIndex)
+            {
+                config.Algoritam = algorithmIndex;
+                config.SacuvajKonfiguraciju();
+            }
+            else
+            {
+                // Dolazi do izvesenja ovog koda u slucaju da je ucitan algoritam iz konfiguracije
+                if (algorithmIndex < cBoxIzborAlgoritma.Items.Count)
+                    cBoxIzborAlgoritma.SelectedIndex = algorithmIndex;
+            }
         }
 
         private void btnIzmeniFSPutanju_Click(object sender, System.EventArgs e)
@@ -112,6 +158,8 @@ namespace ZAD1
 
                 btnIzmeniIzvor.Enabled = false;
                 btnIzmeniOdrediste.Enabled = false;
+
+                cBoxIzborAlgoritma.Enabled = false;
             }
             else if (rbFSWNeaktivan.Checked)
             {
@@ -126,6 +174,8 @@ namespace ZAD1
 
                 btnIzmeniIzvor.Enabled = true;
                 btnIzmeniOdrediste.Enabled = true;
+
+                cBoxIzborAlgoritma.Enabled = true;
             }
         }
 
@@ -153,7 +203,16 @@ namespace ZAD1
             openFileDiag.InitialDirectory = tbIzvor.Text;
             if (openFileDiag.ShowDialog() == DialogResult.OK)
             {
-                string decryptedText = fLogic.DecryptFile(openFileDiag.FileName);
+                string decryptedText;
+                try
+                {
+                    decryptedText = fLogic.DecryptFile(openFileDiag.FileName);
+                }
+                catch (Exception ex)
+                {
+                    ShowError(ex.Message);
+                    return;
+                }
 
                 ShowInfo("Uspesno dekodiranje", $"Uspesno ste izvršili dekodiranje fajla: {openFileDiag.FileName}.\nSada izaberite lokaciju za cuvanje fajla.");
 
@@ -170,9 +229,12 @@ namespace ZAD1
                 lblStatus.Text = $"[FSW] Pronasao sam fajl {e.Name}";
                 if (File.Exists(e.FullPath))
                 {
-                    FileLogic logic = new FileLogic(tbOdrediste.Text);
+                    ICipherAlgorithm algorithm = GetAlgoritmInstanceByIndex(currentAlgorithmIndex);
+                    if (algorithm == null) return;
+
+                    FileLogic logic = new FileLogic(algorithm, tbOdrediste.Text);
                     logic.EncryptFile(e.FullPath, tbOdrediste.Text);
-                    lblStatus.Text = $"[FSW] Enkripcija fajla {e.Name} zavrsena!";
+                    lblStatus.Text = $"[FSW - {algorithm.GetType().Name}] Enkripcija fajla {e.Name} zavrsena!";
                 }
             }
             catch (Exception ex)
@@ -189,6 +251,13 @@ namespace ZAD1
         private void ShowInfo(string title, string text)
         {
             MessageBox.Show(this, text, title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void cBoxIzborAlgoritma_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            ComboBox cmb = sender as ComboBox;
+
+            SetAlgorithm(cmb.SelectedIndex);
         }
     }
 }
