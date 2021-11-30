@@ -239,7 +239,7 @@ namespace ZAD1
             }
             catch (Exception ex)
             {
-                lblStatus.Text = ex.Message;
+                lblStatus.Text = $"Exception: {ex.Message}";
             }
         }
 
