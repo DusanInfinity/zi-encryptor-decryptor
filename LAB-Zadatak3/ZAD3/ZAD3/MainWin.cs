@@ -4,7 +4,6 @@ using System.IO;
 using System.Windows.Forms;
 using ZAD1.App;
 using ZAD2.App;
-using ZAD3.App.Hash;
 
 namespace ZAD1
 {
@@ -28,9 +27,6 @@ namespace ZAD1
             SetIzvor(config.Izvor);
             SetOdrediste(config.Odrediste);
             SetAlgorithm(config.Algoritam);
-
-            TigerHash hash = new TigerHash();
-            ShowInfo("TigerHashTest", hash.Hash("TIGAR") == hash.Hash("TIGAR") ? "TACNO" : "NETACNO");
         }
 
         private void SetIzvor(string path)
@@ -222,7 +218,7 @@ namespace ZAD1
 
                 saveFileDiag.FileName = $"{Path.GetFileNameWithoutExtension(openFileDiag.FileName)}Decrypted.txt";
                 if (saveFileDiag.ShowDialog() == DialogResult.OK)
-                    FileLogic.SaveTextToFile(decryptedText, saveFileDiag.FileName);
+                    fLogic.SaveTextToFile(decryptedText, saveFileDiag.FileName);
             }
         }
 

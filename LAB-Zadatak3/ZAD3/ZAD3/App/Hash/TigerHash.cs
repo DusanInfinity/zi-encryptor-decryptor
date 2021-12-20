@@ -36,7 +36,7 @@ namespace ZAD3.App.Hash
             return new string(outarrchar);
         }
 
-        private byte[] Hash(byte[] array, int numOfBytes)
+        public byte[] Hash(byte[] array, int numOfBytes)
         {
             Initialize();
 

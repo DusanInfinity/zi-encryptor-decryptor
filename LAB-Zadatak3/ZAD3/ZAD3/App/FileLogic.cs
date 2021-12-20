@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using ZAD2.App;
+using ZAD3.App.Hash;
 
 namespace ZAD1
 {
@@ -8,11 +9,13 @@ namespace ZAD1
     {
         private ICipherAlgorithm Algorithm;
         private string KeysPath;
+        private TigerHash tiger;
 
         public FileLogic(ICipherAlgorithm algorithm, string keysPath)
         {
             Algorithm = algorithm;
             KeysPath = keysPath;
+            tiger = new TigerHash();
         }
 
         public void SetKeysPath(string path)
@@ -31,7 +34,7 @@ namespace ZAD1
                 string encryptedText = Algorithm.CryptedText;
 
                 string fileNameForDest = Path.GetFileName(fileName);
-                SaveTextToFile(encryptedText, Path.Combine(destDirectory, fileNameForDest));
+                SaveTextToFile(encryptedText, Path.Combine(destDirectory, fileNameForDest), true);
 
                 string keyFileName = $"{Path.GetFileNameWithoutExtension(fileName)}.{GetKeyExtension()}";
                 SaveTextToFile(generatedKey, Path.Combine(destDirectory, keyFileName));
@@ -40,7 +43,12 @@ namespace ZAD1
 
         public string DecryptFile(string fileName)
         {
-            string encryptedText = LoadTextFromFile(fileName);
+            Tuple<string, string> data = LoadTextAndHashFromFile(fileName);
+            string hash = data.Item1;
+            string encryptedText = data.Item2;
+
+            if (tiger.Hash(encryptedText) != hash)
+                throw new Exception("TigerHash teksta i sačuvani hash iz fajla se ne poklapaju!");
 
             string key;
             try
@@ -82,11 +90,13 @@ namespace ZAD1
         }
 
 
-        public static void SaveTextToFile(string text, string destFileName)
+        public void SaveTextToFile(string text, string destFileName, bool saveTigerHash = false)
         {
             if (!string.IsNullOrEmpty(destFileName))
             {
                 using StreamWriter sw = new StreamWriter(destFileName, false);
+                if (saveTigerHash)
+                    sw.WriteLine(tiger.Hash(text));
                 sw.Write(text);
                 sw.Close();
             }
@@ -99,6 +109,16 @@ namespace ZAD1
             sr.Close();
 
             return text;
+        }
+
+        public static Tuple<string, string> LoadTextAndHashFromFile(string fileName)
+        {
+            using StreamReader sr = new StreamReader(fileName);
+            string tigerHash = sr.ReadLine();
+            string text = sr.ReadToEnd();
+            sr.Close();
+
+            return new Tuple<string, string>(tigerHash, text);
         }
     }
 }
