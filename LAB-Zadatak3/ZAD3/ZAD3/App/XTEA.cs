@@ -8,21 +8,18 @@ namespace ZAD2.App
     // - TEA algoritam sa predavanja
     // - https://en.wikipedia.org/wiki/XTEA
     // - https://gist.github.com/InfectedBytes/ff8d5de8592bfc711380801cb29b3915
-    public class XTEA : ICipherAlgorithm
+    public class XTEA : CipherAlgorithm
     {
         private readonly Encoding encoding = Encoding.Unicode;
         private readonly uint[] K = new uint[4]; // 128bit kljuc
         private readonly uint delta = 0x9E3779B9;
-
-        public string PlainText { get; set; }
-        public string CryptedText { get; set; }
 
         public XTEA(string key = "sdgwabhe46wv3465b34h63vwcac53QWb")
         {
             SetEncriptionKey(key);
         }
 
-        public bool Encrypt()
+        public override bool Encrypt()
         {
             try
             {
@@ -71,7 +68,7 @@ namespace ZAD2.App
             v[1] = v1;
         }
 
-        public bool Decrypt()
+        public override bool Decrypt()
         {
             try
             {
@@ -125,7 +122,7 @@ namespace ZAD2.App
             v[1] = v1;
         }
 
-        public void SetEncriptionKey(string value)
+        public override void SetEncriptionKey(string value)
         {
             byte[] key = encoding.GetBytes(value);
             byte[] hash = new byte[16];
@@ -139,12 +136,6 @@ namespace ZAD2.App
 
             for (int i = 0; i < 4; i++)
                 K[i] = BitConverter.ToUInt32(hash, i * 4);
-        }
-        public string GenerateAndSetNewKey()
-        {
-            string key = Guid.NewGuid().ToString();
-            SetEncriptionKey(key);
-            return key;
         }
 
         private static int NextMultipleOf8(int length)

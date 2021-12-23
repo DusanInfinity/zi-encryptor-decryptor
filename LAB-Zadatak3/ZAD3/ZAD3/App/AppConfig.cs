@@ -9,6 +9,9 @@ namespace ZAD1.App
         public string Izvor { get; set; } = "";
         public string Odrediste { get; set; } = "";
         public int Algoritam { get; set; } = 0;
+        public bool CRTActive { get; set; } = false;
+
+
 
         private static readonly string ConfFile = "config.json";
 

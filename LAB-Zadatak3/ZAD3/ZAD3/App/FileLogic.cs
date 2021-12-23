@@ -7,15 +7,16 @@ namespace ZAD1
 {
     class FileLogic
     {
-        private ICipherAlgorithm Algorithm;
+        private CipherAlgorithm Algorithm;
         private string KeysPath;
         private TigerHash tiger;
 
-        public FileLogic(ICipherAlgorithm algorithm, string keysPath)
+        public FileLogic(CipherAlgorithm algorithm, string keysPath, bool crtModeActive)
         {
             Algorithm = algorithm;
             KeysPath = keysPath;
             tiger = new TigerHash();
+            ToggleCRTMode(crtModeActive);
         }
 
         public void SetKeysPath(string path)
@@ -28,7 +29,9 @@ namespace ZAD1
             string plainText = LoadTextFromFile(fileName);
 
             Algorithm.PlainText = plainText;
-            string generatedKey = Algorithm.GenerateAndSetNewKey();
+            Tuple<string, string> data = Algorithm.GenerateAndSetNewKey();
+            string generatedKey = data.Item1;
+            string generatedCTR = data.Item2;
             if (Algorithm.Encrypt())
             {
                 string encryptedText = Algorithm.CryptedText;
@@ -37,7 +40,7 @@ namespace ZAD1
                 SaveTextToFile(encryptedText, Path.Combine(destDirectory, fileNameForDest), true);
 
                 string keyFileName = $"{Path.GetFileNameWithoutExtension(fileName)}.{GetKeyExtension()}";
-                SaveTextToFile(generatedKey, Path.Combine(destDirectory, keyFileName));
+                SaveTextToFile(generatedKey + "\n" + generatedCTR, Path.Combine(destDirectory, keyFileName));
             }
         }
 
@@ -50,10 +53,14 @@ namespace ZAD1
             if (tiger.Hash(encryptedText) != hash)
                 throw new Exception("TigerHash teksta i sačuvani hash iz fajla se ne poklapaju!");
 
+            Tuple<string, string> keyData;
             string key;
+            string initialCtrString;
             try
             {
-                key = LoadKeyForFile(fileName);
+                keyData = LoadKeyForFile(fileName);
+                key = keyData.Item1;
+                initialCtrString = keyData.Item2;
             }
             catch
             {
@@ -62,24 +69,37 @@ namespace ZAD1
 
             Algorithm.SetEncriptionKey(key);
             Algorithm.CryptedText = encryptedText;
+            if (Algorithm.CTRModeActive)
+                Algorithm.SetInitialCTR(initialCtrString);
+
             if (Algorithm.Decrypt())
                 return Algorithm.PlainText;
 
             return "ERROR";
         }
 
-        public void SetAlgorithm(ICipherAlgorithm algorithm)
+        public void SetAlgorithm(CipherAlgorithm algorithm)
         {
             if (algorithm.GetType() == Algorithm.GetType()) return;
 
             Algorithm = algorithm;
         }
 
-        public string LoadKeyForFile(string filePath)
+        public void ToggleCRTMode(bool active)
+        {
+            Algorithm.CTRModeActive = active;
+        }
+
+        public Tuple<string, string> LoadKeyForFile(string filePath)
         {
             string name = Path.GetFileNameWithoutExtension(filePath);
             string keyPath = Path.Combine(KeysPath, $"{name}.{GetKeyExtension()}");
-            return LoadTextFromFile(keyPath);
+            using StreamReader sr = new StreamReader(keyPath);
+            string key = sr.ReadLine();
+            string initialCtr = sr.ReadToEnd();
+            sr.Close();
+
+            return new Tuple<string, string>(key, initialCtr);
         }
 
         // Dodajemo prefix radi lakseg prepoznavanja koji algoritam je enkriptovao fajl, sve moze da radi i  sa zajednickom(.key) ekstenzijom.

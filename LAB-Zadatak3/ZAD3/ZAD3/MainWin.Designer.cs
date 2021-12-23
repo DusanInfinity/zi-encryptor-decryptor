@@ -49,9 +49,14 @@ namespace ZAD1
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblIzborAlgoritma = new System.Windows.Forms.Label();
             this.cBoxIzborAlgoritma = new System.Windows.Forms.ComboBox();
+            this.rbCRTNeaktivan = new System.Windows.Forms.RadioButton();
+            this.rbCRTAktivan = new System.Windows.Forms.RadioButton();
+            this.lblCRTMode = new System.Windows.Forms.Label();
+            this.gBoxCRT = new System.Windows.Forms.GroupBox();
             this.gbKodiranje.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.fsWatcher)).BeginInit();
             this.statStrip.SuspendLayout();
+            this.gBoxCRT.SuspendLayout();
             this.SuspendLayout();
             // 
             // gbKodiranje
@@ -70,9 +75,9 @@ namespace ZAD1
             this.gbKodiranje.Controls.Add(this.btnKodiranje);
             this.gbKodiranje.Controls.Add(this.tbIzvor);
             this.gbKodiranje.Controls.Add(this.lblIzvor);
-            this.gbKodiranje.Location = new System.Drawing.Point(12, 105);
+            this.gbKodiranje.Location = new System.Drawing.Point(12, 155);
             this.gbKodiranje.Name = "gbKodiranje";
-            this.gbKodiranje.Size = new System.Drawing.Size(396, 275);
+            this.gbKodiranje.Size = new System.Drawing.Size(396, 259);
             this.gbKodiranje.TabIndex = 0;
             this.gbKodiranje.TabStop = false;
             this.gbKodiranje.Text = "File System Watcher";
@@ -80,7 +85,7 @@ namespace ZAD1
             // btnDekodiranje
             // 
             this.btnDekodiranje.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDekodiranje.Location = new System.Drawing.Point(263, 237);
+            this.btnDekodiranje.Location = new System.Drawing.Point(263, 221);
             this.btnDekodiranje.Name = "btnDekodiranje";
             this.btnDekodiranje.Size = new System.Drawing.Size(127, 25);
             this.btnDekodiranje.TabIndex = 2;
@@ -104,7 +109,7 @@ namespace ZAD1
             this.rbFSWNeaktivan.AutoSize = true;
             this.rbFSWNeaktivan.BackColor = System.Drawing.SystemColors.Control;
             this.rbFSWNeaktivan.ForeColor = System.Drawing.Color.Maroon;
-            this.rbFSWNeaktivan.Location = new System.Drawing.Point(165, 225);
+            this.rbFSWNeaktivan.Location = new System.Drawing.Point(165, 209);
             this.rbFSWNeaktivan.Name = "rbFSWNeaktivan";
             this.rbFSWNeaktivan.Size = new System.Drawing.Size(78, 19);
             this.rbFSWNeaktivan.TabIndex = 4;
@@ -137,7 +142,7 @@ namespace ZAD1
             this.rbFSWAktivan.BackColor = System.Drawing.SystemColors.Control;
             this.rbFSWAktivan.Checked = true;
             this.rbFSWAktivan.ForeColor = System.Drawing.Color.DarkGreen;
-            this.rbFSWAktivan.Location = new System.Drawing.Point(94, 225);
+            this.rbFSWAktivan.Location = new System.Drawing.Point(94, 209);
             this.rbFSWAktivan.Name = "rbFSWAktivan";
             this.rbFSWAktivan.Size = new System.Drawing.Size(65, 19);
             this.rbFSWAktivan.TabIndex = 3;
@@ -150,7 +155,7 @@ namespace ZAD1
             // 
             this.lblFSWStatus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lblFSWStatus.AutoSize = true;
-            this.lblFSWStatus.Location = new System.Drawing.Point(21, 225);
+            this.lblFSWStatus.Location = new System.Drawing.Point(21, 209);
             this.lblFSWStatus.Name = "lblFSWStatus";
             this.lblFSWStatus.Size = new System.Drawing.Size(67, 15);
             this.lblFSWStatus.TabIndex = 2;
@@ -169,7 +174,7 @@ namespace ZAD1
             // btnKodiranje
             // 
             this.btnKodiranje.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnKodiranje.Location = new System.Drawing.Point(263, 206);
+            this.btnKodiranje.Location = new System.Drawing.Point(263, 190);
             this.btnKodiranje.Name = "btnKodiranje";
             this.btnKodiranje.Size = new System.Drawing.Size(127, 25);
             this.btnKodiranje.TabIndex = 1;
@@ -216,7 +221,7 @@ namespace ZAD1
             // 
             this.statStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.lblStatus});
-            this.statStrip.Location = new System.Drawing.Point(0, 369);
+            this.statStrip.Location = new System.Drawing.Point(0, 417);
             this.statStrip.Name = "statStrip";
             this.statStrip.Size = new System.Drawing.Size(420, 22);
             this.statStrip.TabIndex = 1;
@@ -251,16 +256,76 @@ namespace ZAD1
             this.cBoxIzborAlgoritma.TabIndex = 3;
             this.cBoxIzborAlgoritma.SelectionChangeCommitted += new System.EventHandler(this.cBoxIzborAlgoritma_SelectionChangeCommitted);
             // 
+            // rbCRTNeaktivan
+            // 
+            this.rbCRTNeaktivan.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.rbCRTNeaktivan.AutoSize = true;
+            this.rbCRTNeaktivan.BackColor = System.Drawing.SystemColors.Control;
+            this.rbCRTNeaktivan.ForeColor = System.Drawing.Color.Maroon;
+            this.rbCRTNeaktivan.Location = new System.Drawing.Point(229, 31);
+            this.rbCRTNeaktivan.Name = "rbCRTNeaktivan";
+            this.rbCRTNeaktivan.Size = new System.Drawing.Size(78, 19);
+            this.rbCRTNeaktivan.TabIndex = 7;
+            this.rbCRTNeaktivan.Text = "Neaktivan";
+            this.rbCRTNeaktivan.UseVisualStyleBackColor = false;
+            // 
+            // rbCRTAktivan
+            // 
+            this.rbCRTAktivan.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.rbCRTAktivan.AutoSize = true;
+            this.rbCRTAktivan.BackColor = System.Drawing.SystemColors.Control;
+            this.rbCRTAktivan.Checked = true;
+            this.rbCRTAktivan.ForeColor = System.Drawing.Color.DarkGreen;
+            this.rbCRTAktivan.Location = new System.Drawing.Point(158, 31);
+            this.rbCRTAktivan.Name = "rbCRTAktivan";
+            this.rbCRTAktivan.Size = new System.Drawing.Size(65, 19);
+            this.rbCRTAktivan.TabIndex = 6;
+            this.rbCRTAktivan.TabStop = true;
+            this.rbCRTAktivan.Text = "Aktivan";
+            this.rbCRTAktivan.UseVisualStyleBackColor = false;
+            this.rbCRTAktivan.CheckedChanged += new System.EventHandler(this.rbCRTAktivan_CheckedChanged);
+            // 
+            // lblCRTMode
+            // 
+            this.lblCRTMode.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblCRTMode.AutoSize = true;
+            this.lblCRTMode.Location = new System.Drawing.Point(85, 31);
+            this.lblCRTMode.Name = "lblCRTMode";
+            this.lblCRTMode.Size = new System.Drawing.Size(58, 15);
+            this.lblCRTMode.TabIndex = 5;
+            this.lblCRTMode.Text = "CRT mod:";
+            // 
+            // gBoxCRT
+            // 
+            this.gBoxCRT.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gBoxCRT.Controls.Add(this.lblCRTMode);
+            this.gBoxCRT.Controls.Add(this.rbCRTNeaktivan);
+            this.gBoxCRT.Controls.Add(this.rbCRTAktivan);
+            this.gBoxCRT.Location = new System.Drawing.Point(12, 73);
+            this.gBoxCRT.Name = "gBoxCRT";
+            this.gBoxCRT.Size = new System.Drawing.Size(397, 71);
+            this.gBoxCRT.TabIndex = 8;
+            this.gBoxCRT.TabStop = false;
+            this.gBoxCRT.Text = "CRT";
+            // 
             // MainWin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(420, 391);
+            this.ClientSize = new System.Drawing.Size(420, 439);
+            this.Controls.Add(this.gBoxCRT);
             this.Controls.Add(this.cBoxIzborAlgoritma);
             this.Controls.Add(this.lblIzborAlgoritma);
             this.Controls.Add(this.statStrip);
             this.Controls.Add(this.gbKodiranje);
-            this.MinimumSize = new System.Drawing.Size(436, 430);
+            this.MinimumSize = new System.Drawing.Size(436, 478);
             this.Name = "MainWin";
             this.Text = "ZI Encryptor/Decryptor";
             this.gbKodiranje.ResumeLayout(false);
@@ -268,6 +333,8 @@ namespace ZAD1
             ((System.ComponentModel.ISupportInitialize)(this.fsWatcher)).EndInit();
             this.statStrip.ResumeLayout(false);
             this.statStrip.PerformLayout();
+            this.gBoxCRT.ResumeLayout(false);
+            this.gBoxCRT.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -295,6 +362,10 @@ namespace ZAD1
         private System.Windows.Forms.ToolStripStatusLabel lblStatus;
         private System.Windows.Forms.ComboBox cBoxIzborAlgoritma;
         private System.Windows.Forms.Label lblIzborAlgoritma;
+        private System.Windows.Forms.GroupBox gBoxCRT;
+        private System.Windows.Forms.RadioButton rbCRTNeaktivan;
+        private System.Windows.Forms.RadioButton rbCRTAktivan;
+        private System.Windows.Forms.Label lblCRTMode;
     }
 }
 

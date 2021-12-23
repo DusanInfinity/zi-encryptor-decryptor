@@ -12,23 +12,25 @@ namespace ZAD1
         private readonly FileLogic fLogic;
         private readonly AppConfig config;
         private int currentAlgorithmIndex = 0;
+        private bool crtActive = false;
 
         public MainWin()
         {
             InitializeComponent();
 
-            fLogic = new FileLogic(new RC4(), tbOdrediste.Text);
+            fLogic = new FileLogic(new RC4(), tbOdrediste.Text, false);
             cBoxIzborAlgoritma.Items.AddRange(new[] { "RC4", "XTEA" });
             cBoxIzborAlgoritma.SelectedIndex = 0;
 
             rbFSWNeaktivan.Checked = true;
+            rbCRTNeaktivan.Checked = true;
 
             config = AppConfig.UcitajKonfiguraciju();
             SetIzvor(config.Izvor);
             SetOdrediste(config.Odrediste);
             SetAlgorithm(config.Algoritam);
+            SetCRTActive(config.CRTActive);
         }
-
         private void SetIzvor(string path)
         {
             if (!Directory.Exists(path)) return;
@@ -45,7 +47,7 @@ namespace ZAD1
             fLogic.SetKeysPath(path);
         }
 
-        private static ICipherAlgorithm GetAlgoritmInstanceByIndex(int index)
+        private static CipherAlgorithm GetAlgoritmInstanceByIndex(int index)
         {
             switch (index)
             {
@@ -67,10 +69,11 @@ namespace ZAD1
             if (currentAlgorithmIndex == algorithmIndex) return;
 
 
-            ICipherAlgorithm algorithm = GetAlgoritmInstanceByIndex(algorithmIndex);
+            CipherAlgorithm algorithm = GetAlgoritmInstanceByIndex(algorithmIndex);
             if (algorithm == null) return;
 
             fLogic.SetAlgorithm(algorithm);
+            fLogic.ToggleCRTMode(crtActive);
             currentAlgorithmIndex = algorithmIndex;
 
             if (config.Algoritam != algorithmIndex)
@@ -83,6 +86,25 @@ namespace ZAD1
                 // Dolazi do izvesenja ovog koda u slucaju da je ucitan algoritam iz konfiguracije
                 if (algorithmIndex < cBoxIzborAlgoritma.Items.Count)
                     cBoxIzborAlgoritma.SelectedIndex = algorithmIndex;
+            }
+        }
+
+        private void SetCRTActive(bool active)
+        {
+            if (crtActive == active) return;
+
+            fLogic.ToggleCRTMode(active);
+            crtActive = active;
+
+            if (config.CRTActive != active)
+            {
+                config.CRTActive = active;
+                config.SacuvajKonfiguraciju();
+            }
+            else
+            {
+                // Dolazi do izvesenja ovog koda u slucaju da je ucitan algoritam iz konfiguracije
+                rbCRTAktivan.Checked = true; // algoritam je sigurno aktivan zato sto po defaultu algoritam je neaktivan
             }
         }
 
@@ -160,6 +182,9 @@ namespace ZAD1
                 btnIzmeniOdrediste.Enabled = false;
 
                 cBoxIzborAlgoritma.Enabled = false;
+
+                rbCRTAktivan.Enabled = false;
+                rbCRTNeaktivan.Enabled = false;
             }
             else if (rbFSWNeaktivan.Checked)
             {
@@ -176,6 +201,9 @@ namespace ZAD1
                 btnIzmeniOdrediste.Enabled = true;
 
                 cBoxIzborAlgoritma.Enabled = true;
+
+                rbCRTAktivan.Enabled = true;
+                rbCRTNeaktivan.Enabled = true;
             }
         }
 
@@ -229,10 +257,10 @@ namespace ZAD1
                 lblStatus.Text = $"[FSW] Pronasao sam fajl {e.Name}";
                 if (File.Exists(e.FullPath))
                 {
-                    ICipherAlgorithm algorithm = GetAlgoritmInstanceByIndex(currentAlgorithmIndex);
+                    CipherAlgorithm algorithm = GetAlgoritmInstanceByIndex(currentAlgorithmIndex);
                     if (algorithm == null) return;
 
-                    FileLogic logic = new FileLogic(algorithm, tbOdrediste.Text);
+                    FileLogic logic = new FileLogic(algorithm, tbOdrediste.Text, crtActive);
                     logic.EncryptFile(e.FullPath, tbOdrediste.Text);
                     lblStatus.Text = $"[FSW - {algorithm.GetType().Name}] Enkripcija fajla {e.Name} zavrsena!";
                 }
@@ -258,6 +286,11 @@ namespace ZAD1
             ComboBox cmb = sender as ComboBox;
 
             SetAlgorithm(cmb.SelectedIndex);
+        }
+
+        private void rbCRTAktivan_CheckedChanged(object sender, EventArgs e)
+        {
+            SetCRTActive(rbCRTAktivan.Checked);
         }
     }
 }
