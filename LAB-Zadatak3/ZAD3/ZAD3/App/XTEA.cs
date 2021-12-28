@@ -31,21 +31,11 @@ namespace ZAD2.App
                 Array.Copy(lengthBuffer, result, lengthBuffer.Length);
                 Array.Copy(data, 0, result, lengthBuffer.Length, data.Length);
 
-                uint[] block_V = new uint[2];
-                using (var stream = new MemoryStream(result))
-                {
-                    using (var writer = new BinaryWriter(stream))
-                    {
-                        for (int i = 0; i < result.Length; i += 8) // po 8 bajta - 64bit
-                        {
-                            block_V[0] = BitConverter.ToUInt32(result, i); // prva 4 bajta (32bit)
-                            block_V[1] = BitConverter.ToUInt32(result, i + 4); // druga 4 bajta (32bit) - ukupno 64bit
-                            Encrypt(block_V, K);
-                            writer.Write(block_V[0]);
-                            writer.Write(block_V[1]);
-                        }
-                    }
-                }
+                if (CTRModeActive)
+                    EncryptWithCTRMode(result);
+                else
+                    Encrypt(result);
+
 
                 CryptedText = Convert.ToBase64String(result);
                 return true;
@@ -53,6 +43,52 @@ namespace ZAD2.App
             catch
             {
                 return false;
+            }
+        }
+
+        private void EncryptWithCTRMode(byte[] result)
+        {
+            uint[] block_V = new uint[2];
+            byte[] counter = new byte[8];
+            Array.Copy(InitialCounter, counter, 8);
+
+            using (var stream = new MemoryStream(result))
+            {
+                using (var writer = new BinaryWriter(stream))
+                {
+                    for (int i = 0; i < result.Length; i += 8) // po 8 bajta - 64bit
+                    {
+                        block_V[0] = BitConverter.ToUInt32(counter, 0); // prva 4 bajta COUNTERA
+                        block_V[1] = BitConverter.ToUInt32(counter, 4); // druga 4 bajta COUNTERA
+                        Encrypt(block_V, K);
+                        uint firstByte = block_V[0] ^ BitConverter.ToUInt32(result, i);
+                        uint secondByte = block_V[1] ^ BitConverter.ToUInt32(result, i + 4);
+                        writer.Write(firstByte);
+                        writer.Write(secondByte);
+
+                        IncrementByteArray(counter); // Inkrementiranje brojaca
+                    }
+                }
+            }
+        }
+
+
+        private void Encrypt(byte[] result)
+        {
+            uint[] block_V = new uint[2];
+            using (var stream = new MemoryStream(result))
+            {
+                using (var writer = new BinaryWriter(stream))
+                {
+                    for (int i = 0; i < result.Length; i += 8) // po 8 bajta - 64bit
+                    {
+                        block_V[0] = BitConverter.ToUInt32(result, i); // prva 4 bajta (32bit)
+                        block_V[1] = BitConverter.ToUInt32(result, i + 4); // druga 4 bajta (32bit) - ukupno 64bit
+                        Encrypt(block_V, K);
+                        writer.Write(block_V[0]);
+                        writer.Write(block_V[1]);
+                    }
+                }
             }
         }
         private void Encrypt(uint[] v, uint[] key)
@@ -74,32 +110,21 @@ namespace ZAD2.App
             {
                 byte[] data = Convert.FromBase64String(CryptedText);
 
+                byte[] encryptedMsg = new byte[data.Length];
+                Array.Copy(data, encryptedMsg, data.Length);
 
-                byte[] buffer = new byte[data.Length];
-                Array.Copy(data, buffer, data.Length);
+                if (CTRModeActive)
+                    DecryptWithCTRMode(encryptedMsg);
+                else
+                    Decrypt(encryptedMsg);
 
-                uint[] block_V = new uint[2];
-                using (var stream = new MemoryStream(buffer))
-                {
-                    using (var writer = new BinaryWriter(stream))
-                    {
-                        for (int i = 0; i < buffer.Length; i += 8) // po 8 bajta - 64bit
-                        {
-                            block_V[0] = BitConverter.ToUInt32(buffer, i); // prva 4 bajta (32bit)
-                            block_V[1] = BitConverter.ToUInt32(buffer, i + 4); // druga 4 bajta (32bit) - ukupno 64bit
-                            Decrypt(block_V, K);
-                            writer.Write(block_V[0]);
-                            writer.Write(block_V[1]);
-                        }
-                    }
-                }
 
-                uint length = BitConverter.ToUInt32(buffer, 0);
-                if (length > buffer.Length - 4) // nevalidna enkripcija
+                uint length = BitConverter.ToUInt32(encryptedMsg, 0);
+                if (length > encryptedMsg.Length - 4) // nevalidna enkripcija
                     return false;
 
                 byte[] result = new byte[length];
-                Array.Copy(buffer, 4, result, 0, length);
+                Array.Copy(encryptedMsg, 4, result, 0, length);
 
                 PlainText = encoding.GetString(result);
                 return true;
@@ -109,6 +134,52 @@ namespace ZAD2.App
                 return false;
             }
         }
+
+        public void DecryptWithCTRMode(byte[] encryptedMsg)
+        {
+            uint[] block_V = new uint[2];
+            byte[] counter = new byte[8];
+            Array.Copy(InitialCounter, counter, 8);
+
+            using (var stream = new MemoryStream(encryptedMsg))
+            {
+                using (var writer = new BinaryWriter(stream))
+                {
+                    for (int i = 0; i < encryptedMsg.Length; i += 8) // po 8 bajta - 64bit
+                    {
+                        block_V[0] = BitConverter.ToUInt32(counter, 0); // prva 4 bajta COUNTERA
+                        block_V[1] = BitConverter.ToUInt32(counter, 4); // druga 4 bajta COUNTERA
+                        Encrypt(block_V, K); // ENKRIPCIJA!!!! Ne treba dekripcija -> https://en.wikipedia.org/wiki/File:CTR_decryption_2.svg
+                        uint firstByte = block_V[0] ^ BitConverter.ToUInt32(encryptedMsg, i);
+                        uint secondByte = block_V[1] ^ BitConverter.ToUInt32(encryptedMsg, i + 4);
+                        writer.Write(firstByte);
+                        writer.Write(secondByte);
+
+                        IncrementByteArray(counter); // Inkrementiranje brojaca
+                    }
+                }
+            }
+        }
+
+        public void Decrypt(byte[] encryptedMsg)
+        {
+            uint[] block_V = new uint[2];
+            using (var stream = new MemoryStream(encryptedMsg))
+            {
+                using (var writer = new BinaryWriter(stream))
+                {
+                    for (int i = 0; i < encryptedMsg.Length; i += 8) // po 8 bajta - 64bit
+                    {
+                        block_V[0] = BitConverter.ToUInt32(encryptedMsg, i); // prva 4 bajta (32bit)
+                        block_V[1] = BitConverter.ToUInt32(encryptedMsg, i + 4); // druga 4 bajta (32bit) - ukupno 64bit
+                        Decrypt(block_V, K);
+                        writer.Write(block_V[0]);
+                        writer.Write(block_V[1]);
+                    }
+                }
+            }
+        }
+
         private void Decrypt(uint[] v, uint[] key)
         {
             uint v0 = v[0], v1 = v[1], sum = 32 * delta;
@@ -142,6 +213,41 @@ namespace ZAD2.App
         {
             // XTEA blok = 64bit
             return (length + 7) / 8 * 8; // dobijamo broj deljiv sa 8
+        }
+
+        public override Tuple<string, string> GenerateAndSetNewKey()
+        {
+            string key = "sdgwabhe46wv3465b34h63vwcac53QWb";//Guid.NewGuid().ToString(); // GENERISANJE KLJUCA ISKLJUCENO ZBOG TESTIRANJA CTR moda
+            string ctr = "";
+
+            SetEncriptionKey(key);
+            InitialCounter = new byte[8];
+            for (int i = 0; i < 8; i++)
+                InitialCounter[i] = (byte)(new Random().Next(0, 256));
+
+            if (CTRModeActive)
+                ctr = string.Join(" ", InitialCounter);
+
+            return new Tuple<string, string>(key, ctr);
+        }
+
+        private static void IncrementByteArray(byte[] array)
+        {
+            int bytesNum = array.Length;
+            bool overflow = true;
+            for (int i = 0; i < bytesNum; i++)
+            {
+                if (array[i] != 255)
+                {
+                    array[i]++;
+                    overflow = false;
+                    break;
+                }
+            }
+
+            if (overflow == true)
+                for (int i = 0; i < bytesNum; i++)
+                    array[i] = 0;
         }
     }
 }

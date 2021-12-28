@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using ZAD2.App;
 
 namespace ZAD1
@@ -40,13 +41,13 @@ namespace ZAD1
         {
             byte[] output = new byte[input.Length];
 
-            byte[] counter = new byte[1]; // Kljuc ima 128 bajtova
-            counter[0] = InitialCounter;
+            byte[] counter = new byte[1];
+            counter[0] = InitialCounter[0];
             for (int k = 0; k < input.Length; k++)
             {
                 byte[] counterOutput = Encrypt(counter);
                 output[k] = (byte)(input[k] ^ counterOutput[0]);
-                counter[0] = (byte)((counter[0] + 1) % 128);
+                counter[0] = (byte)((counter[0] + 1) % 256);
             }
 
             return output;
@@ -125,6 +126,20 @@ namespace ZAD1
                 ArrayS[i] = ArrayS[j];
                 ArrayS[j] = temp;
             }
+        }
+
+        public override Tuple<string, string> GenerateAndSetNewKey()
+        {
+            string key = "sdgwabhe46wv3465b34h63vwcac53QWb";//Guid.NewGuid().ToString(); // GENERISANJE KLJUCA ISKLJUCENO ZBOG TESTIRANJA CTR moda
+            string ctr = "";
+
+            SetEncriptionKey(key);
+            InitialCounter = new byte[1];
+            InitialCounter[0] = (byte)(new Random().Next(0, 256));
+            if (CTRModeActive)
+                ctr = string.Join(" ", InitialCounter);
+
+            return new Tuple<string, string>(key, ctr);
         }
     }
 }

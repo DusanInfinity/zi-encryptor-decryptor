@@ -53,7 +53,7 @@ namespace ZAD3.App.Hash
             { // mogli smo i prvo da prosirimo do umnoska od 512 pa sve chunkove da obradimo odjednom
                 byte[] finalBytes = new byte[numOfFinalBytes];
                 Array.Copy(array, numOfMessageChunks * 64, finalBytes, 0, numOfFinalBytes);
-                HashFinalMessageBlock(finalBytes, numOfFinalBytes, numOfBytes);
+                HashLastMessageChunk(finalBytes, numOfFinalBytes, numOfBytes);
             }
 
 
@@ -126,7 +126,7 @@ namespace ZAD3.App.Hash
         }
 
 
-        private void HashFinalMessageBlock(byte[] finalBytes, int numOfFinalBytes, int numOfUnpaddedBytes)
+        private void HashLastMessageChunk(byte[] finalBytes, int numOfFinalBytes, int numOfUnpaddedBytes)
         {
 
             if (numOfFinalBytes < 56) // 56 bajta * 8 bita = 448 bita (ostavljamo poslednja 64 bita za ulong - broj bajtova bez nadovezivanja izrazen u broju bitova)

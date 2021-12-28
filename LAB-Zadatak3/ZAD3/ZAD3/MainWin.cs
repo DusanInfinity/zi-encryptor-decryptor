@@ -228,7 +228,7 @@ namespace ZAD1
                 return;
             }
 
-            openFileDiag.InitialDirectory = tbIzvor.Text;
+            openFileDiag.InitialDirectory = tbOdrediste.Text;
             if (openFileDiag.ShowDialog() == DialogResult.OK)
             {
                 string decryptedText;
